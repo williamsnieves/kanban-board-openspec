@@ -5,8 +5,8 @@ This document summarizes the current status of specs defined in the exploratory 
 ## Current Snapshot
 
 - Workspace: `apps/kanban-exploratory-version`
-- Specs defined: **7**
-- Planning artifacts (`proposal/spec/design/tasks`): **complete for all 7**
+- Specs defined: **8**
+- Planning artifacts (`proposal/spec/design/tasks`): **complete for all 8**
 - Implementation (`/opsx-apply`) progress: **not started** (0 completed tasks in all changes)
 
 ## Spec Status Table
@@ -20,6 +20,7 @@ This document summarizes the current status of specs defined in the exploratory 
 | `board-column-reorder` | Custom-column reorder via drag-and-drop + left/right fallback, default columns protected | 0/25 | Complete |
 | `board-management-flow` | Dashboard view, create board with name validation, list boards, navigate to board, mock persistence | 0/14 | Complete |
 | `app-data-persistence` | LocalStorage adapter, state hydration on startup, date serialization, error handling | 0/10 | Complete |
+| `board-card-advanced-metadata` | Card description, labels, due date, priority, detail modal, visual indicators | 0/18 | Complete |
 
 ## Delivered Spec Coverage (So Far)
 
@@ -58,13 +59,18 @@ This document summarizes the current status of specs defined in the exploratory 
 - Ensures data durability across sessions.
 - Adds serialization and error handling for storage.
 
+### 8) `board-card-advanced-metadata`
+- Enriches the task model with description, labels, due date, and priority.
+- Adds a detailed view (modal) for editing card properties.
+- Enhances the board view with visual metadata indicators.
+
 ## What Is Pending
 
 All implementation tasks are pending.  
 Current totals:
 
 - Completed tasks: **0**
-- Total planned tasks: **152**
+- Total planned tasks: **170**
 
 ## Recommended Apply Order
 
@@ -75,8 +81,9 @@ To minimize dependency friction during implementation:
 3. `app-data-persistence` (Persistence layer)
 4. `board-view-default-columns`
 5. `board-card-basic-crud`
-6. `board-column-basic-management`
-7. `board-column-reorder`
+6. `board-card-advanced-metadata` (Depends on basic CRUD)
+7. `board-column-basic-management`
+8. `board-column-reorder`
 
 ## Specs Pending Creation (Backlog)
 
@@ -85,7 +92,6 @@ They remain pending definition after latest scope decisions.
 
 | Candidate Spec | Why It Is Pending | Suggested Status |
 |---|---|---|
-| `board-card-advanced-metadata` | Card metadata (description, labels, due date, assignee, priority) was excluded from `board-card-basic-crud` | pending-definition |
 | `board-card-collaboration-features` | Comments, attachments, subtasks, and activity history were excluded from `board-card-basic-crud` | pending-definition |
 
 ### Backlog Notes
