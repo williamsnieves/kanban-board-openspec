@@ -64,6 +64,26 @@ To minimize dependency friction during implementation:
 4. `board-column-basic-management`
 5. `board-column-reorder`
 
+## Specs Pending Creation (Backlog)
+
+These specs are not created yet in `openspec/changes/`.  
+They remain pending definition after latest scope decisions.
+
+| Candidate Spec | Why It Is Pending | Suggested Status |
+|---|---|---|
+| `board-card-advanced-metadata` | Card metadata (description, labels, due date, assignee, priority) was excluded from `board-card-basic-crud` | pending-definition |
+| `board-card-collaboration-features` | Comments, attachments, subtasks, and activity history were excluded from `board-card-basic-crud` | pending-definition |
+
+### Backlog Notes
+
+- This backlog is a planning aid, not yet formalized as OpenSpec changes.
+- Create one spec at a time and keep the same exploratory workflow protocol.
+- If priorities change, reorder this backlog before creating the next change.
+- Discarded from backlog by decision:
+  - `ci-quality-pipeline-setup`
+  - `board-column-reorder-accessibility`
+  - `board-column-reorder-persistence`
+
 ## Notes
 
 - This summary reflects the exploratory planning phase only.
