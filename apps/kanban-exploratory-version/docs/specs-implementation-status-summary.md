@@ -5,8 +5,8 @@ This document summarizes the current status of specs defined in the exploratory 
 ## Current Snapshot
 
 - Workspace: `apps/kanban-exploratory-version`
-- Specs defined: **6**
-- Planning artifacts (`proposal/spec/design/tasks`): **complete for all 6**
+- Specs defined: **7**
+- Planning artifacts (`proposal/spec/design/tasks`): **complete for all 7**
 - Implementation (`/opsx-apply`) progress: **not started** (0 completed tasks in all changes)
 
 ## Spec Status Table
@@ -19,6 +19,7 @@ This document summarizes the current status of specs defined in the exploratory 
 | `board-column-basic-management` | Column create/rename/delete-empty-only, protected defaults, unique names case-insensitive | 0/31 | Complete |
 | `board-column-reorder` | Custom-column reorder via drag-and-drop + left/right fallback, default columns protected | 0/25 | Complete |
 | `board-management-flow` | Dashboard view, create board with name validation, list boards, navigate to board, mock persistence | 0/14 | Complete |
+| `app-data-persistence` | LocalStorage adapter, state hydration on startup, date serialization, error handling | 0/10 | Complete |
 
 ## Delivered Spec Coverage (So Far)
 
@@ -52,13 +53,18 @@ This document summarizes the current status of specs defined in the exploratory 
 - Enables creating and listing multiple boards.
 - Updates the mock store to handle a collection of boards.
 
+### 7) `app-data-persistence`
+- Replaces in-memory mock with `localStorage` persistence.
+- Ensures data durability across sessions.
+- Adds serialization and error handling for storage.
+
 ## What Is Pending
 
 All implementation tasks are pending.  
 Current totals:
 
 - Completed tasks: **0**
-- Total planned tasks: **142**
+- Total planned tasks: **152**
 
 ## Recommended Apply Order
 
@@ -66,10 +72,11 @@ To minimize dependency friction during implementation:
 
 1. `app-foundation-setup`
 2. `board-management-flow` (New entry point)
-3. `board-view-default-columns`
-4. `board-card-basic-crud`
-5. `board-column-basic-management`
-6. `board-column-reorder`
+3. `app-data-persistence` (Persistence layer)
+4. `board-view-default-columns`
+5. `board-card-basic-crud`
+6. `board-column-basic-management`
+7. `board-column-reorder`
 
 ## Specs Pending Creation (Backlog)
 
