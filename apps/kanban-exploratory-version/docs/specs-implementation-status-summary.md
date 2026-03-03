@@ -5,8 +5,8 @@ This document summarizes the current status of specs defined in the exploratory 
 ## Current Snapshot
 
 - Workspace: `apps/kanban-exploratory-version`
-- Specs defined: **8**
-- Planning artifacts (`proposal/spec/design/tasks`): **complete for all 8**
+- Specs defined: **9**
+- Planning artifacts (`proposal/spec/design/tasks`): **complete for all 9**
 - Implementation (`/opsx-apply`) progress: **not started** (0 completed tasks in all changes)
 
 ## Spec Status Table
@@ -21,6 +21,7 @@ This document summarizes the current status of specs defined in the exploratory 
 | `board-management-flow` | Dashboard view, create board with name validation, list boards, navigate to board, mock persistence | 0/14 | Complete |
 | `app-data-persistence` | LocalStorage adapter, state hydration on startup, date serialization, error handling | 0/10 | Complete |
 | `board-card-advanced-metadata` | Card description, labels, due date, priority, detail modal, visual indicators | 0/18 | Complete |
+| `board-card-collaboration-features` | Comments, subtasks/checklists, activity log, visual indicators, detail modal tabs | 0/18 | Complete |
 
 ## Delivered Spec Coverage (So Far)
 
@@ -64,13 +65,18 @@ This document summarizes the current status of specs defined in the exploratory 
 - Adds a detailed view (modal) for editing card properties.
 - Enhances the board view with visual metadata indicators.
 
+### 9) `board-card-collaboration-features`
+- Adds comments, subtasks, and activity logging.
+- Updates the card detail modal with tabs for new features.
+- Simulates a collaborative environment for task tracking.
+
 ## What Is Pending
 
 All implementation tasks are pending.  
 Current totals:
 
 - Completed tasks: **0**
-- Total planned tasks: **170**
+- Total planned tasks: **188**
 
 ## Recommended Apply Order
 
@@ -82,23 +88,16 @@ To minimize dependency friction during implementation:
 4. `board-view-default-columns`
 5. `board-card-basic-crud`
 6. `board-card-advanced-metadata` (Depends on basic CRUD)
-7. `board-column-basic-management`
-8. `board-column-reorder`
+7. `board-card-collaboration-features` (Depends on advanced metadata/modal)
+8. `board-column-basic-management`
+9. `board-column-reorder`
 
 ## Specs Pending Creation (Backlog)
 
-These specs are not created yet in `openspec/changes/`.  
-They remain pending definition after latest scope decisions.
-
-| Candidate Spec | Why It Is Pending | Suggested Status |
-|---|---|---|
-| `board-card-collaboration-features` | Comments, attachments, subtasks, and activity history were excluded from `board-card-basic-crud` | pending-definition |
+No pending specs. The exploratory planning phase for the MVP is complete.
 
 ### Backlog Notes
 
-- This backlog is a planning aid, not yet formalized as OpenSpec changes.
-- Create one spec at a time and keep the same exploratory workflow protocol.
-- If priorities change, reorder this backlog before creating the next change.
 - Discarded from backlog by decision:
   - `ci-quality-pipeline-setup`
   - `board-column-reorder-accessibility`
