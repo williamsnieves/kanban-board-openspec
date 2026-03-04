@@ -13,9 +13,11 @@ FlowBoard needs a deterministic MVP baseline to move from product intent to impl
 ## Capabilities
 
 ### New Capabilities
+
 - `kanban-board-mvp`: Core board, columns, task management, task movement, and local persistence requirements for FlowBoard MVP.
 
 ### Modified Capabilities
+
 - None.
 
 ## Impact

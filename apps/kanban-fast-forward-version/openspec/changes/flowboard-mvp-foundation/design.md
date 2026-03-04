@@ -5,11 +5,13 @@ FlowBoard MVP requires a minimal but complete Kanban baseline with deterministic
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Implement a single-user Kanban board flow that covers board creation/access, default columns, task CRUD, move/reorder, and persistence.
 - Keep behavior deterministic so outcomes are stable and testable across runs.
 - Minimize architecture complexity to accelerate MVP delivery.
 
 **Non-Goals:**
+
 - Multi-user collaboration or real-time synchronization.
 - Role/permission systems.
 - Backend API and database integration in this change.
@@ -51,6 +53,7 @@ FlowBoard MVP requires a minimal but complete Kanban baseline with deterministic
 5. Future migration path: introduce API persistence adapter while preserving the same domain contracts.
 
 Rollback strategy:
+
 - Revert to last stable commit and clear persisted local storage namespace for FlowBoard data.
 
 ## Open Questions
