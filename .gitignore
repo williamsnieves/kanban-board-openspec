@@ -34,7 +34,6 @@ coverage/
 .cursor/
 !.cursor/skills/
 !.cursor/rules/
-.claude/
 !.claude/skills/
 !.claude/commands/
 agent-transcripts/
