@@ -5,11 +5,13 @@ The MVP now includes multiple behavioral specs and needs a unified quality frame
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Define mandatory quality gates for MVP feature completion.
 - Define a reusable, standardized Definition of Done.
 - Define requirement-scenario-test traceability as an enforceable rule.
 
 **Non-Goals:**
+
 - Implementing CI pipelines in this iteration.
 - Defining team-specific workflow tooling details.
 - Writing implementation code.

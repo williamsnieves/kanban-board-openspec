@@ -13,11 +13,13 @@ FlowBoard MVP needs explicit quality gates and a Definition of Done to keep deli
 ## Capabilities
 
 ### New Capabilities
+
 - `mvp-quality-gates`: Quality gate rules that must pass before feature completion.
 - `feature-definition-of-done`: Standard DoD checklist for feature-level closure.
 - `requirement-traceability`: Requirement → scenario → test linkage rules for verification.
 
 ### Modified Capabilities
+
 - None.
 
 ## Impact

@@ -5,12 +5,14 @@ Current work has multiple MVP behavior specs but no explicit technical bootstrap
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Define React + TypeScript + Vite as the application scaffold baseline.
 - Define Vitest as test baseline.
 - Define governance expectations in `AGENTS.md`.
 - Define process expectations for TDD and AAA scenario structure.
 
 **Non-Goals:**
+
 - Actual scaffold implementation in this iteration.
 - CI/CD implementation details.
 - Runtime feature implementation.

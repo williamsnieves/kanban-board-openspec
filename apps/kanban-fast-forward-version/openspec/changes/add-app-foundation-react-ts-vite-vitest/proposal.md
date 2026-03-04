@@ -14,10 +14,12 @@ FlowBoard needs a deterministic technical foundation before implementation to re
 ## Capabilities
 
 ### New Capabilities
+
 - `app-foundation-setup`: Technical baseline and scaffold requirements for React/TypeScript/Vite/Vitest project setup.
 - `engineering-governance-rules`: Project-level rules and development principles documented in `AGENTS.md`.
 
 ### Modified Capabilities
+
 - None.
 
 ## Impact
