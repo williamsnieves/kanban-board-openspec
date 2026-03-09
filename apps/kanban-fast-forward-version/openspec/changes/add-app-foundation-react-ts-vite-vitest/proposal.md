@@ -4,19 +4,20 @@ FlowBoard needs a deterministic technical foundation before implementation to re
 
 ## What Changes
 
-- Define the initial application skeleton using React + TypeScript + Vite.
-- Define test foundation with Vitest as the default testing runner.
-- Define baseline project rules via `AGENTS.md` covering SOLID, YAGNI, POLA, and KISS.
-- Define mandatory TDD workflow for feature implementation.
-- Define required AAA (Arrange-Act-Assert) structure for every test scenario.
-- Keep this change spec-only (no implementation in this iteration).
+- Define executable setup requirements to create a working initial app skeleton using React + TypeScript + Vite.
+- Define verification checkpoints proving the scaffold works (`install`, `build`, `test`, and local run smoke).
+- Define test foundation with Vitest as the default unit/integration runner.
+- Define Playwright baseline and configuration for QA E2E automation of core user journeys.
+- Define baseline project rules via concise `AGENTS.md` focused on non-obvious guidance for agents.
+- Define mandatory TDD workflow for feature implementation and AAA (Arrange-Act-Assert) test scenario structure.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `app-foundation-setup`: Technical baseline and scaffold requirements for React/TypeScript/Vite/Vitest project setup.
-- `engineering-governance-rules`: Project-level rules and development principles documented in `AGENTS.md`.
+- `app-foundation-setup`: Technical baseline and executable setup requirements for React/TypeScript/Vite/Vitest project bootstrap.
+- `qa-e2e-foundation`: Playwright configuration and E2E baseline requirements for QA agent workflows.
+- `engineering-governance-rules`: Concise project-level rules and development principles documented in `AGENTS.md`.
 
 ### Modified Capabilities
 
@@ -24,6 +25,6 @@ FlowBoard needs a deterministic technical foundation before implementation to re
 
 ## Impact
 
-- Affected systems: repository structure, test strategy baseline, development workflow expectations.
-- Affected documentation: introduction of governance document `AGENTS.md` and quality conventions.
-- Tooling impact: Vite and Vitest become baseline framework/tooling choices for MVP implementation.
+- Affected systems: repository scaffold, test strategy baseline, QA automation baseline, and development workflow expectations.
+- Affected documentation: introduction of concise governance document `AGENTS.md` with non-obvious implementation constraints.
+- Tooling impact: Vite, Vitest, and Playwright become baseline framework/tooling choices for MVP implementation.
