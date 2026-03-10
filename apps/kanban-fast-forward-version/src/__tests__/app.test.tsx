@@ -10,6 +10,8 @@ describe('React TypeScript Vite scaffold baseline', () => {
     render(<App />)
 
     // Assert
-    expect(screen.getByRole('heading', { name: /vite \+ react/i })).toBeInTheDocument()
+    expect(screen.getByTestId('board-name-input')).toBeInTheDocument()
+    expect(screen.getByTestId('create-board-btn')).toBeInTheDocument()
+    expect(screen.getByTestId('board-list')).toBeInTheDocument()
   })
 })
