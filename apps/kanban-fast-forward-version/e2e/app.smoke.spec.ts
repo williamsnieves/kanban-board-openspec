@@ -10,6 +10,6 @@ test.describe('Playwright E2E baseline', () => {
     await page.goto('/')
 
     // Assert
-    await expect(page.getByRole('heading', { name: /vite \+ react/i })).toBeVisible()
+    await expect(page.getByText('FlowBoard')).toBeVisible()
   })
 })
