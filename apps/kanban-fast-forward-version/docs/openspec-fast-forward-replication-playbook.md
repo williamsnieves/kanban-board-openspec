@@ -1,5 +1,11 @@
 # OpenSpec Fast-Forward Demo Replication Playbook (Local-Only)
 
+## OpenSpec Official Documentation (Main)
+
+- Workflows: <https://github.com/Fission-AI/OpenSpec/blob/main/docs/workflows.md>
+- Commands: <https://github.com/Fission-AI/OpenSpec/blob/main/docs/commands.md>
+- CLI: <https://github.com/Fission-AI/OpenSpec/blob/main/docs/cli.md>
+
 This guide reproduces the same spec workflow we executed, but **without requiring push/PR**.
 
 ## 1) Goal

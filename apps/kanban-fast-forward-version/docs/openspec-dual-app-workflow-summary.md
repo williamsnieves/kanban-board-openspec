@@ -1,6 +1,13 @@
 # OpenSpec Dual-App Workflow Summary
 
+## OpenSpec Official Documentation (Main)
+
+- Workflows: <https://github.com/Fission-AI/OpenSpec/blob/main/docs/workflows.md>
+- Commands: <https://github.com/Fission-AI/OpenSpec/blob/main/docs/commands.md>
+- CLI: <https://github.com/Fission-AI/OpenSpec/blob/main/docs/cli.md>
+
 ## Objective
+
 This document defines the working flow for a dual-app setup where each app has its own OpenSpec context and workflow:
 
 - `apps/kanban-exploratory-version` -> Exploratory mode
@@ -32,6 +39,7 @@ kanban-board-openspec/
 Always open and work on each app as an independent workspace in Cursor.
 
 Why this matters:
+
 - OpenSpec commands/skills generated in `.cursor/` are app-local.
 - Slash commands are more reliable when the app folder is the workspace root.
 - Specs and changes remain isolated per approach.
@@ -58,6 +66,7 @@ apps/kanban-exploratory-version
 ```
 
 Purpose:
+
 - Discover and refine requirements before finalizing artifacts.
 - Build specs progressively with explicit confirmation between steps.
 
@@ -97,6 +106,7 @@ apps/kanban-fast-forward-version
 ```
 
 Purpose:
+
 - Create planning artifacts quickly when scope is already clear.
 - Execute implementation with reduced discovery loops.
 
@@ -185,4 +195,3 @@ git checkout -b feat/<spec-name>
   - OpenSpec is initialized in that app.
   - `.cursor/commands` exists in that app.
   - Cursor has been restarted after setup.
-
