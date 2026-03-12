@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useBoardStore } from '@/features/board/useBoardStore';
 import { useThemeStore } from '@/features/theme/useThemeStore';
+import { normalizeColumns } from '@/features/board/normalizeColumns';
 
 export function BoardView() {
   const { id } = useParams<{ id: string }>();
@@ -26,14 +27,25 @@ export function BoardView() {
     );
   }
 
+  const displayColumns = normalizeColumns(board.columns);
+
   return (
     <div>
       <h1>{board.name}</h1>
       <button onClick={toggleTheme}>{theme === 'light' ? 'Dark mode' : 'Light mode'}</button>
       <div>
-        {board.columns.map((column) => (
+        {displayColumns.map((column) => (
           <div key={column.id}>
             <h2>{column.name}</h2>
+            {column.tasks.length === 0 ? (
+              <p>No tasks</p>
+            ) : (
+              <ul>
+                {column.tasks.map((task) => (
+                  <li key={task.id}>{task.title}</li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
       </div>
