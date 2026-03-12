@@ -19,5 +19,6 @@
 ## 3. Verify and Closure Gates
 
 - [ ] 3.1 Run apply evidence review: each completed slice shows failing→passing proof and touched files list
-- [ ] 3.2 Run verify gate using contract + acceptance checklist and confirm no unresolved traceability mapping
-- [ ] 3.3 Confirm closure rule: apply completed + verify approved before archive eligibility
+- [ ] 3.2 Run mandatory baseline E2E coverage for core flows and attach pass evidence for: same-column reorder, cross-column move, invalid-drop rollback, keyboard fallback
+- [ ] 3.3 Run verify gate using contract + acceptance checklist and confirm no unresolved traceability mapping
+- [ ] 3.4 Confirm closure rule: apply completed + verify approved + baseline E2E evidence complete before archive eligibility

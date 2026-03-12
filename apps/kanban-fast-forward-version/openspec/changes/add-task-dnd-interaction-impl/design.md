@@ -40,11 +40,17 @@ This design formalizes an implementation-ready execution contract for this capab
    - Rationale: Prevents spec-only closure and aligns with DoD expectations.
    - Alternative considered: archive on docs completion (rejected).
 
+5. Baseline E2E coverage is mandatory for critical user flows
+   - Decision: Verify phase must include E2E evidence for core DnD flows (same-column reorder, cross-column move, invalid-drop rollback, keyboard fallback).
+   - Rationale: These scenarios validate end-to-end interaction and state consistency under real UI behavior.
+   - Alternative considered: unit/integration-only verification (rejected as insufficient for interaction-critical risk).
+
 ## Risks / Trade-offs
 
 - [Risk] High number of scenario slices increases coordination overhead → Mitigation: keep each slice minimal and independently verifiable.
 - [Risk] Evidence quality varies across contributors → Mitigation: reviewer gate requires explicit failing→passing artifacts for each completed task.
 - [Risk] Drift between UI and store invariants in DnD flows → Mitigation: force checklist validation against contract rules before verify pass.
+- [Risk] E2E suite instability or slowness can delay closure → Mitigation: keep a minimal mandatory baseline E2E set and run targeted E2E scenarios first.
 
 ## Migration Plan
 
