@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Task priority catalog
 
@@ -12,7 +12,7 @@ The system SHALL support task priority values limited to `low`, `medium`, and `h
 #### Scenario: Reject invalid priority value
 
 - **WHEN** a task is submitted with a priority value outside `low|medium|high`
-- **THEN** the system rejects the operation with a clear validation error
+- **THEN** the system rejects the operation with a clear validation error ("Priority must be one of: low, medium, high.")
 
 ### Requirement: Optional due date metadata
 
@@ -35,7 +35,7 @@ The system SHALL reject invalid due date inputs and present deterministic valida
 #### Scenario: Reject invalid date format
 
 - **WHEN** the user submits an invalid date value for `dueDate`
-- **THEN** the system blocks the update and displays a clear validation message
+- **THEN** the system blocks the update and displays: "Due date must be a valid date (YYYY-MM-DD)."
 
 ### Requirement: Task card metadata display
 
@@ -44,11 +44,11 @@ The system SHALL display task priority and due date in each task card using a le
 #### Scenario: Render priority and due date in card
 
 - **WHEN** a task has priority and/or due date metadata
-- **THEN** the task card displays those values in a readable format
+- **THEN** the task card displays priority badge always and due date only when set, in human-readable format
 
 ### Requirement: Local-first metadata persistence
 
-The system SHALL persist and restore `priority` and `dueDate` fields through local-first storage across refresh and reopen.
+The system SHALL persist and restore `priority` and `dueDate` fields through local-first storage across refresh and reopen. Legacy tasks without `priority` SHALL default to `"medium"` in memory.
 
 #### Scenario: Restore metadata after reload
 

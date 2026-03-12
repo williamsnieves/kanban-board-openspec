@@ -14,7 +14,19 @@ export function loadState(): Board[] | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as Board[];
+    let boards = JSON.parse(raw) as Board[];
+    // Default priority to 'medium' for legacy tasks lacking this field
+    boards = boards.map(board => ({
+      ...board,
+      columns: board.columns.map(col => ({
+        ...col,
+        tasks: col.tasks.map(task => ({
+          ...task,
+          priority: (task as { priority?: string }).priority ?? 'medium',
+        })),
+      })),
+    }));
+    return boards;
   } catch {
     return null;
   }

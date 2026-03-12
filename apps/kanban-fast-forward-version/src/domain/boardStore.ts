@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Board, Task } from './types';
+import type { Board, Task, Priority } from './types';
 import { createBoard as buildBoard } from './board';
 import { normalizePositions, insertAtPosition } from './position';
 import { saveState, loadState } from './storage';
@@ -13,8 +13,8 @@ interface BoardStore {
   renameBoard: (boardId: string, name: string) => void;
   deleteBoard: (boardId: string) => void;
 
-  addTask: (columnId: string, title: string, description?: string) => void;
-  updateTask: (taskId: string, title: string, description?: string) => void;
+  addTask: (columnId: string, title: string, priority: Priority, dueDate?: string, description?: string) => void;
+  updateTask: (taskId: string, title: string, priority: Priority, dueDate?: string, description?: string) => void;
   deleteTask: (taskId: string) => void;
 
   reorderTask: (columnId: string, taskId: string, newPosition: number) => void;
@@ -67,14 +67,17 @@ export const useBoardStore = create<BoardStore>((set) => ({
     });
   },
 
-  addTask: (columnId, title, description) => {
+  addTask: (columnId, title, priority, dueDate, description) => {
     if (!title.trim()) return;
+    if (!(['low', 'medium', 'high'] as const).includes(priority)) return;
     const task: Task = {
       id: crypto.randomUUID(),
       title: title.trim(),
       description: description?.trim(),
       columnId,
       position: 0,
+      priority,
+      ...(dueDate ? { dueDate } : {}),
     };
     set((state) => {
       const next = state.boards.map((board) => ({
@@ -90,8 +93,9 @@ export const useBoardStore = create<BoardStore>((set) => ({
     });
   },
 
-  updateTask: (taskId, title, description) => {
+  updateTask: (taskId, title, priority, dueDate, description) => {
     if (!title.trim()) return;
+    if (!(['low', 'medium', 'high'] as const).includes(priority)) return;
     set((state) => {
       const next = state.boards.map((board) => ({
         ...board,
@@ -99,7 +103,13 @@ export const useBoardStore = create<BoardStore>((set) => ({
           ...col,
           tasks: col.tasks.map((t) =>
             t.id === taskId
-              ? { ...t, title: title.trim(), description: description?.trim() }
+              ? {
+                  ...t,
+                  title: title.trim(),
+                  description: description?.trim(),
+                  priority,
+                  dueDate: dueDate === '' ? undefined : dueDate,
+                }
               : t,
           ),
         })),

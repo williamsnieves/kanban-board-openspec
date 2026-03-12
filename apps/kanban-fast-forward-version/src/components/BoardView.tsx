@@ -2,6 +2,16 @@ import { useState } from 'react';
 import { useBoardStore } from '../domain/boardStore';
 import { normalizePositions } from '../domain/position';
 import { TaskCard } from './TaskCard';
+import type { Priority } from '../domain/types';
+
+const VALID_PRIORITIES = ['low', 'medium', 'high'] as const;
+
+function isValidDate(d: string): boolean {
+  if (!d) return true;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+  const date = new Date(d + 'T00:00:00');
+  return !isNaN(date.getTime());
+}
 
 export function BoardView() {
   const selectedBoardId = useBoardStore((s) => s.selectedBoardId);
@@ -10,6 +20,10 @@ export function BoardView() {
 
   const [addInputs, setAddInputs] = useState<Record<string, string>>({});
   const [addErrors, setAddErrors] = useState<Record<string, string>>({});
+  const [addPriorities, setAddPriorities] = useState<Record<string, string>>({});
+  const [addDueDates, setAddDueDates] = useState<Record<string, string>>({});
+  const [addPriorityErrors, setAddPriorityErrors] = useState<Record<string, string>>({});
+  const [addDueDateErrors, setAddDueDateErrors] = useState<Record<string, string>>({});
 
   if (!selectedBoardId) {
     return (
@@ -31,9 +45,27 @@ export function BoardView() {
       setAddErrors((prev) => ({ ...prev, [columnId]: 'Task title is required' }));
       return;
     }
-    addTask(columnId, title.trim());
+    const priority = (addPriorities[columnId] ?? 'medium') as Priority;
+    const dueDateVal = addDueDates[columnId] ?? '';
+    let valid = true;
+    if (!VALID_PRIORITIES.includes(priority)) {
+      setAddPriorityErrors(p => ({ ...p, [columnId]: 'Priority must be one of: low, medium, high.' }));
+      valid = false;
+    } else {
+      setAddPriorityErrors(p => ({ ...p, [columnId]: '' }));
+    }
+    if (dueDateVal && !isValidDate(dueDateVal)) {
+      setAddDueDateErrors(p => ({ ...p, [columnId]: 'Due date must be a valid date (YYYY-MM-DD).' }));
+      valid = false;
+    } else {
+      setAddDueDateErrors(p => ({ ...p, [columnId]: '' }));
+    }
+    if (!valid) return;
+    addTask(columnId, title.trim(), priority, dueDateVal || undefined);
     setAddInputs((prev) => ({ ...prev, [columnId]: '' }));
     setAddErrors((prev) => ({ ...prev, [columnId]: '' }));
+    setAddPriorities(p => ({ ...p, [columnId]: 'medium' }));
+    setAddDueDates(p => ({ ...p, [columnId]: '' }));
   }
 
   return (
@@ -75,6 +107,26 @@ export function BoardView() {
                     {addErrors[col.id]}
                   </span>
                 )}
+                <select
+                  data-testid="task-priority-select"
+                  value={addPriorities[col.id] ?? 'medium'}
+                  onChange={(e) => setAddPriorities(p => ({ ...p, [col.id]: e.target.value }))}
+                  className="border rounded px-1 py-0.5 text-xs"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+                {addPriorityErrors[col.id] && <span data-testid="task-priority-error" className="text-red-500 text-xs">{addPriorityErrors[col.id]}</span>}
+                <input
+                  data-testid="task-due-date-input"
+                  type="text"
+                  placeholder="YYYY-MM-DD"
+                  value={addDueDates[col.id] ?? ''}
+                  onChange={(e) => setAddDueDates(p => ({ ...p, [col.id]: e.target.value }))}
+                  className="border rounded px-1 py-0.5 text-xs"
+                />
+                {addDueDateErrors[col.id] && <span data-testid="task-due-date-error" className="text-red-500 text-xs">{addDueDateErrors[col.id]}</span>}
                 <button
                   data-testid="add-task-btn"
                   onClick={() => handleAddTask(col.id)}
