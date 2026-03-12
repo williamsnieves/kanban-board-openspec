@@ -37,7 +37,7 @@ describe('Task lifecycle management', () => {
     const todoCol = board.columns.find((c) => c.name === 'Todo')!
 
     // Act
-    useBoardStore.getState().addTask(todoCol.id, 'My Task')
+    useBoardStore.getState().addTask(todoCol.id, 'My Task', 'medium')
 
     // Assert
     const updatedCol = useBoardStore.getState().boards[0].columns.find((c) => c.name === 'Todo')!
@@ -51,11 +51,11 @@ describe('Task lifecycle management', () => {
     useBoardStore.getState().createBoard('Sprint Board')
     const board = useBoardStore.getState().boards[0]
     const todoCol = board.columns.find((c) => c.name === 'Todo')!
-    useBoardStore.getState().addTask(todoCol.id, 'Original Title', 'Original Desc')
+    useBoardStore.getState().addTask(todoCol.id, 'Original Title', 'medium', undefined, 'Original Desc')
     const task = useBoardStore.getState().boards[0].columns.find((c) => c.name === 'Todo')!.tasks[0]
 
     // Act
-    useBoardStore.getState().updateTask(task.id, 'Updated Title', 'Updated Desc')
+    useBoardStore.getState().updateTask(task.id, 'Updated Title', 'medium', undefined, 'Updated Desc')
 
     // Assert
     const updatedTask = useBoardStore.getState().boards[0].columns.find((c) => c.name === 'Todo')!.tasks[0]
@@ -70,7 +70,7 @@ describe('Task lifecycle management', () => {
     useBoardStore.getState().createBoard('Sprint Board')
     const board = useBoardStore.getState().boards[0]
     const todoCol = board.columns.find((c) => c.name === 'Todo')!
-    useBoardStore.getState().addTask(todoCol.id, 'Task to Delete')
+    useBoardStore.getState().addTask(todoCol.id, 'Task to Delete', 'medium')
     const task = useBoardStore.getState().boards[0].columns.find((c) => c.name === 'Todo')!.tasks[0]
 
     // Act
@@ -90,8 +90,8 @@ describe('Task ordering and movement', () => {
     useBoardStore.getState().createBoard('Sprint Board')
     const board = useBoardStore.getState().boards[0]
     const todoCol = board.columns.find((c) => c.name === 'Todo')!
-    useBoardStore.getState().addTask(todoCol.id, 'Task A')
-    useBoardStore.getState().addTask(todoCol.id, 'Task B')
+    useBoardStore.getState().addTask(todoCol.id, 'Task A', 'medium')
+    useBoardStore.getState().addTask(todoCol.id, 'Task B', 'medium')
     const tasksBefore = useBoardStore.getState().boards[0].columns.find((c) => c.name === 'Todo')!.tasks
     const taskA = tasksBefore.find((t) => t.title === 'Task A')!
     const taskB = tasksBefore.find((t) => t.title === 'Task B')!
