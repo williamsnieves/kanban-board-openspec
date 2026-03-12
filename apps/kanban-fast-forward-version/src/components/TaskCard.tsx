@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useDraggable } from '@dnd-kit/core';
 import type { Task, Column, Priority } from '../domain/types';
 import { useBoardStore } from '../domain/boardStore';
 
@@ -61,6 +62,36 @@ export function TaskCard({ task, columns, isFirst, isLast }: Props) {
     setEditError('');
   }
 
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: task.id,
+  });
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    const colIndex = columns.findIndex((c) => c.id === task.columnId);
+
+    if (e.key === 'ArrowDown') {
+      if (!isLast) {
+        e.preventDefault();
+        reorderTask(task.columnId, task.id, task.position + 1);
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (!isFirst) {
+        e.preventDefault();
+        reorderTask(task.columnId, task.id, task.position - 1);
+      }
+    } else if (e.key === 'ArrowRight') {
+      if (colIndex < columns.length - 1) {
+        e.preventDefault();
+        moveTask(task.id, columns[colIndex + 1].id);
+      }
+    } else if (e.key === 'ArrowLeft') {
+      if (colIndex > 0) {
+        e.preventDefault();
+        moveTask(task.id, columns[colIndex - 1].id);
+      }
+    }
+  }
+
   if (editing) {
     return (
       <div data-testid="task-item" className="bg-white border rounded p-2 flex flex-col gap-1 shadow-sm">
@@ -114,7 +145,23 @@ export function TaskCard({ task, columns, isFirst, isLast }: Props) {
   }
 
   return (
-    <div data-testid="task-item" className="bg-white border rounded p-2 flex flex-col gap-1 shadow-sm">
+    <div
+      data-testid="task-card"
+      ref={setNodeRef}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className="bg-white border rounded p-2 flex flex-col gap-1 shadow-sm"
+    >
+      <div
+        data-testid="drag-handle"
+        {...listeners}
+        {...attributes}
+        className="cursor-grab text-gray-400 text-xs select-none"
+        aria-label="Drag to reorder"
+      >
+        ⠿
+      </div>
       <div className="font-medium text-sm">{task.title}</div>
       {task.description && (
         <div className="text-xs text-gray-500">{task.description}</div>

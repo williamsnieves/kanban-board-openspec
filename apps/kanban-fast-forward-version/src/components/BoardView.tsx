@@ -1,8 +1,25 @@
 import { useState } from 'react';
+import { DndContext } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { useDroppable } from '@dnd-kit/core';
 import { useBoardStore } from '../domain/boardStore';
 import { normalizePositions } from '../domain/position';
 import { TaskCard } from './TaskCard';
-import type { Priority } from '../domain/types';
+import type { Column, Priority } from '../domain/types';
+
+function DroppableColumn({ col, children }: { col: Column; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: col.id });
+  return (
+    <div
+      ref={setNodeRef}
+      data-testid={`droppable-column-${col.name}`}
+      style={{ backgroundColor: isOver ? '#e0f2fe' : undefined }}
+      className="flex flex-col gap-2 bg-gray-50 rounded p-3 min-w-[220px] flex-shrink-0"
+    >
+      {children}
+    </div>
+  );
+}
 
 const VALID_PRIORITIES = ['low', 'medium', 'high'] as const;
 
@@ -17,6 +34,8 @@ export function BoardView() {
   const selectedBoardId = useBoardStore((s) => s.selectedBoardId);
   const boards = useBoardStore((s) => s.boards);
   const addTask = useBoardStore((s) => s.addTask);
+  const moveTask = useBoardStore((s) => s.moveTask);
+  const reorderTask = useBoardStore((s) => s.reorderTask);
 
   const [addInputs, setAddInputs] = useState<Record<string, string>>({});
   const [addErrors, setAddErrors] = useState<Record<string, string>>({});
@@ -38,6 +57,28 @@ export function BoardView() {
 
   const sortedColumns = normalizePositions(board.columns);
   const totalTasks = board.columns.reduce((sum, col) => sum + col.tasks.length, 0);
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over) return;
+
+    const taskId = active.id as string;
+    const targetColumnId = over.id as string;
+
+    let sourceColumnId = '';
+    for (const col of board.columns) {
+      const found = col.tasks.find((t) => t.id === taskId);
+      if (found) {
+        sourceColumnId = col.id;
+        break;
+      }
+    }
+
+    if (!sourceColumnId) return;
+    if (sourceColumnId === targetColumnId) return;
+
+    moveTask(taskId, targetColumnId);
+  }
 
   function handleAddTask(columnId: string) {
     const title = addInputs[columnId] ?? '';
@@ -71,15 +112,13 @@ export function BoardView() {
   return (
     <div className="flex flex-col h-full">
       <h1 className="text-xl font-bold px-4 py-3 border-b">{board.name}</h1>
+      <DndContext onDragEnd={handleDragEnd}>
       <div className="flex gap-4 p-4 overflow-x-auto flex-1">
         {sortedColumns.map((col) => {
           const colTasks = normalizePositions(col.tasks);
           return (
-            <div
-              key={col.id}
-              data-testid={`column-${col.name}`}
-              className="flex flex-col gap-2 bg-gray-50 rounded p-3 min-w-[220px] flex-shrink-0"
-            >
+            <DroppableColumn key={col.id} col={col}>
+              <div data-testid={`column-${col.name}`} className="contents">
               <h2 className="font-semibold text-sm">{col.name}</h2>
               {colTasks.map((task, idx) => (
                 <TaskCard
@@ -135,10 +174,12 @@ export function BoardView() {
                   + Add task
                 </button>
               </div>
-            </div>
+              </div>
+            </DroppableColumn>
           );
         })}
       </div>
+      </DndContext>
       {totalTasks === 0 && (
         <div data-testid="empty-state-no-tasks" className="flex flex-col items-center justify-center flex-1 gap-3 text-gray-500 mt-8 pb-8">
           <p className="text-base">No tasks yet</p>
