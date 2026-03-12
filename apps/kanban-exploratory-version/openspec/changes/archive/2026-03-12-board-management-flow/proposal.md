@@ -14,13 +14,19 @@ To fulfill the core product requirement of managing multiple projects or context
 - Update the **Mock Data Store** to support multiple boards:
     - Store boards as a collection.
     - Ensure board IDs are unique.
+- Add a **Dark Mode toggle**:
+    - Allows users to switch between light and dark themes.
+    - Persists the user's preference to `localStorage`.
+    - Applied globally across all views.
 - **Out of Scope**:
     - Deleting boards.
     - Renaming boards.
     - Board descriptions or metadata.
     - Real database persistence (continue using in-memory/local mock).
+    - System-level theme detection (no `prefers-color-scheme` auto-detection).
 
 ## Impact
 - **New UI Route**: A new home/dashboard route is introduced.
 - **Store Update**: The data model expands to handle a collection of boards rather than a single implicit board state.
 - **Navigation**: The application flow changes from "direct to board" to "dashboard -> board".
+- **Theme Store**: A new `useThemeStore` (or equivalent) manages the active theme and persists it to `localStorage`.
