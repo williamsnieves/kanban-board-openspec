@@ -8,7 +8,7 @@ The archived `add-task-priority-and-due-date` artifacts define behavior well but
 - Enforce atomic scenario tasks with mandatory outputs: failing test, minimal implementation, passing evidence, reviewer validation.
 - Require explicit requirement → scenario → test traceability for priority, due date, validation, card display, and persistence scenarios.
 - Add closure gates so archive is blocked until apply + verify are both green.
-- Keep this change scoped to OpenSpec artifacts only (no product code changes).
+- Enable direct implementation during apply in app/domain/test layers for all in-scope metadata scenarios.
 
 ## Capabilities
 
@@ -24,4 +24,5 @@ The archived `add-task-priority-and-due-date` artifacts define behavior well but
 
 - Affected artifacts: `proposal.md`, `design.md`, `tasks.md`, and delta spec in `specs/task-priority-and-due-date/spec.md`.
 - Team workflow impact: FE/QA/Reviewer can execute one scenario at a time with objective completion evidence.
+- Implementation impact: expected apply changes include form fields, validation behavior, card metadata rendering, store persistence, and tests.
 - Process impact: prevents definition-only completion by requiring apply and verify approval before archive.

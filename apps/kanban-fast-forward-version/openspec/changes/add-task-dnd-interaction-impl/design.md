@@ -7,14 +7,15 @@ This design formalizes an implementation-ready execution contract for this capab
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Define deterministic execution slices aligned to each DnD scenario in the capability.
 - Require mandatory evidence per slice: failing test, minimal implementation, passing test proof, reviewer validation.
 - Enforce requirement → scenario → test mapping across drag state, movement, feedback, rollback, and keyboard fallback.
 - Block closure until apply and verify are explicitly approved.
 
 **Non-Goals:**
-- Implementing DnD code or modifying React/domain files in this change.
-- Choosing a specific DnD library in this change.
+
+- Imposing a mandatory DnD library choice at spec level (implementation may choose any compliant option).
 - Expanding the feature scope beyond existing `task-dnd-interaction` behavior.
 
 ## Decisions
@@ -48,11 +49,12 @@ This design formalizes an implementation-ready execution contract for this capab
 ## Migration Plan
 
 1. Create and validate `proposal`, `design`, delta `spec`, and `tasks` for `add-task-dnd-interaction-impl`.
-2. Run apply-phase implementation in a separate PR cycle using atomic scenario slices.
+2. Run apply implementation using atomic scenario slices derived from these artifacts.
 3. Run verify gate; block closure on any unresolved scenario mapping or missing evidence.
 4. Archive only after apply complete + verify approved.
 
 Rollback strategy:
+
 - If validation or scope alignment fails, update only this change artifacts and re-run OpenSpec validation.
 - Keep change open until all quality gates are satisfied.
 
