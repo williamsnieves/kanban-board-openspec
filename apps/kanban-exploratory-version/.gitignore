@@ -1,38 +1,24 @@
-# OS
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Node
-node_modules/
-npm-debug.log
-yarn-error.log
-.pnpm-debug.log
-
-# Build
-dist/
-build/
-.next/
-out/
-coverage/
-
-# Environment
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# OpenSpec / AI
-.cursor/
-!.cursor/skills/
-!.cursor/rules/
-!.claude/skills/
-!.claude/commands/
-agent-transcripts/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
