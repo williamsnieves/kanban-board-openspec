@@ -34,6 +34,7 @@ Execution protocol (strict):
 - Work one unchecked task at a time from openspec/changes/add-task-dnd-interaction-impl/tasks.md.
 - A task can be marked done only if it includes both: (a) product code change(s) in `src/**`, and (b) related test change(s).
 - Docs/spec-only updates are never sufficient to complete an implementation task.
+- Before READY verdict, QA must run and report mandatory baseline E2E coverage for core flows: same-column reorder, cross-column move, invalid-drop rollback, keyboard fallback.
 - For each task:
   1. FE explains short implementation plan.
   2. QA defines/updates tests at the smallest valid level first (Vitest unit/integration), using E2E only when the scenario requires browser-level flow.
@@ -51,4 +52,5 @@ Required final output:
 - Requirement → scenario → test traceability summary.
 - Changed files summary grouped by product code, tests, and docs.
 - Validation log: commands executed + results (including `openspec validate <change>` and test runs).
+- Baseline E2E evidence summary for the four mandatory core flows.
 - Reviewer verdict: READY / NOT READY for archive phase.
