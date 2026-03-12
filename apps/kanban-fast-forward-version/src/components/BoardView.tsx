@@ -23,6 +23,7 @@ export function BoardView() {
   if (!board) return null;
 
   const sortedColumns = normalizePositions(board.columns);
+  const totalTasks = board.columns.reduce((sum, col) => sum + col.tasks.length, 0);
 
   function handleAddTask(columnId: string) {
     const title = addInputs[columnId] ?? '';
@@ -86,6 +87,17 @@ export function BoardView() {
           );
         })}
       </div>
+      {totalTasks === 0 && (
+        <div data-testid="empty-state-no-tasks" className="flex flex-col items-center justify-center flex-1 gap-3 text-gray-500 mt-8 pb-8">
+          <p className="text-base">No tasks yet</p>
+          <button
+            data-testid="empty-state-create-task-cta"
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+          >
+            Add your first task
+          </button>
+        </div>
+      )}
     </div>
   );
 }
