@@ -8,18 +8,21 @@ The archived `add-task-dnd-interaction` change defined behavior clearly, but it 
 - Enforce atomic execution tasks per scenario (failing test, minimal implementation, passing evidence, reviewer validation).
 - Require explicit requirement → scenario → test traceability for drag state, reorder, cross-column move, invalid-drop rollback, and keyboard fallback.
 - Encode closure gates so archive is blocked until apply + verify are both green.
-- Keep this change limited to OpenSpec artifacts only (no production code changes).
+- Enable direct implementation during apply in app/domain/test layers for all in-scope scenarios.
 
 ## Capabilities
 
 ### New Capabilities
+
 - None.
 
 ### Modified Capabilities
+
 - `task-dnd-interaction`: Add implementation-governance constraints, deterministic evidence expectations, and scenario-level traceability requirements for execution.
 
 ## Impact
 
 - Affected artifacts: `proposal.md`, `design.md`, `tasks.md`, and delta spec in `specs/task-dnd-interaction/spec.md`.
 - Team workflow impact: FE/QA/Reviewer execute one scenario slice at a time with objective completion evidence.
+- Implementation impact: expected apply changes include DnD interaction behavior in UI, state/store updates, and scenario-aligned tests.
 - Process impact: prevents definition-only completion by requiring apply/verify success before archive.

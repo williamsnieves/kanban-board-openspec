@@ -15,7 +15,6 @@ This design converts the capability into an implementation-ready execution contr
 
 **Non-Goals:**
 
-- Implementing or modifying React/domain code in this change.
 - Adding new feature behavior outside existing capability requirements.
 - Introducing reminders, notifications, advanced filtering/sorting, backend API integration, or overdue state visuals.
 
@@ -50,7 +49,7 @@ This design converts the capability into an implementation-ready execution contr
 ## Migration Plan
 
 1. Create and validate `proposal`, `design`, delta `spec`, and `tasks` for `add-task-priority-and-due-date-impl`.
-2. Execute apply phase in a separate implementation cycle with scenario-by-scenario atomic slices.
+2. Execute apply implementation with scenario-by-scenario atomic slices tied to these artifacts.
 3. Run verify gate with contract/checklist traceability.
 4. Archive only after apply complete + verify approved.
 

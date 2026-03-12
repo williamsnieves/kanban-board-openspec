@@ -11,11 +11,10 @@ This design introduces deterministic execution rules for this capability so impl
 - Define a deterministic execution contract for this capability: one requirement-scenario-test chain per task group.
 - Enforce atomic tasks where each task produces four mandatory outputs: failing test, minimal implementation, passing evidence, reviewer validation.
 - Define closure gates that block archive until apply and verify are approved.
-- Keep the change scoped to OpenSpec artifacts only.
+- Enable implementation by apply agents without ambiguity in app/domain/test targets.
 
 **Non-Goals:**
 
-- Implementing or modifying React/domain code in this change.
 - Introducing new product behavior beyond what `board-management-basics` already specifies.
 - Reworking unrelated capabilities or test suites.
 
@@ -51,7 +50,7 @@ This design introduces deterministic execution rules for this capability so impl
 
 1. Create proposal/design/tasks and delta spec for `add-board-management-basics-impl`.
 2. Validate OpenSpec artifacts with `openspec validate` and confirm apply-requires readiness using `openspec status`.
-3. Execute implementation in a separate apply phase (outside this change creation step).
+3. Execute implementation in apply using atomic scenario slices tied to these artifacts.
 4. Run verify gate and only then proceed to archive.
 
 Rollback strategy:
