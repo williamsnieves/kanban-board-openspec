@@ -10,6 +10,8 @@ interface BoardStore {
 
   createBoard: (name: string) => void;
   selectBoard: (id: string) => void;
+  renameBoard: (boardId: string, name: string) => void;
+  deleteBoard: (boardId: string) => void;
 
   addTask: (columnId: string, title: string, description?: string) => void;
   updateTask: (taskId: string, title: string, description?: string) => void;
@@ -41,6 +43,28 @@ export const useBoardStore = create<BoardStore>((set) => ({
 
   selectBoard: (id) => {
     set({ selectedBoardId: id });
+  },
+
+  renameBoard: (boardId, name) => {
+    if (!name.trim()) return;
+    set((state) => {
+      const next = state.boards.map((b) =>
+        b.id === boardId ? { ...b, name: name.trim() } : b
+      );
+      persist(next);
+      return { boards: next };
+    });
+  },
+
+  deleteBoard: (boardId) => {
+    set((state) => {
+      const next = state.boards.filter((b) => b.id !== boardId);
+      persist(next);
+      return {
+        boards: next,
+        selectedBoardId: state.selectedBoardId === boardId ? null : state.selectedBoardId,
+      };
+    });
   },
 
   addTask: (columnId, title, description) => {
