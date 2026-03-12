@@ -42,6 +42,13 @@
 7.  **Board View**: Sees the new board with default columns.
 8.  **Navigation**: Can navigate back to `/` to switch boards.
 
+### Dark Mode
+- A toggle button is rendered in the dashboard (and optionally in the board view header).
+- Theme state: `theme: 'light' | 'dark'`, action: `toggleTheme()`.
+- Persisted to `localStorage` under a dedicated key (e.g. `kanban-theme`).
+- Applied by setting a `data-theme` attribute on `<html>` or a CSS class on a root element.
+- No system-level `prefers-color-scheme` detection in this change.
+
 ## Constraints & Trade-offs
 - **Mock Persistence**: Data will be lost on page reload unless we implement `localStorage` persistence in the mock store (which is a good enhancement for DX but not strictly required by the spec if "in-memory" is acceptable for now, though `localStorage` is better for "Exploratory" feel). *Decision: Use `localStorage` for the mock store to allow navigation between pages without losing data.*
 - **No Delete**: Users cannot delete boards yet, so the list might grow indefinitely during testing. This is acceptable for MVP scope.

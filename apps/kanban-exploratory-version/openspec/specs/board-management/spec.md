@@ -40,6 +40,26 @@ The application MUST allow users to open a specific board from the list.
 - **THEN** the application navigates to the board view for "Project X"
 - **AND** the board's columns and tasks are loaded
 
+### Requirement: Dark Mode Toggle
+The application MUST provide a toggle to switch between light and dark themes, and MUST persist the user's preference to localStorage.
+
+#### Scenario: Toggle dark mode on
+- **GIVEN** the user is on the dashboard in light mode
+- **WHEN** the user clicks the dark mode toggle
+- **THEN** the application switches to dark theme
+- **AND** the theme preference is saved to localStorage
+
+#### Scenario: Toggle back to light mode
+- **GIVEN** the user is in dark mode
+- **WHEN** the user clicks the toggle again
+- **THEN** the application switches back to light theme
+- **AND** the preference is updated in localStorage
+
+#### Scenario: Persist theme preference on reload
+- **GIVEN** the user previously selected dark mode
+- **WHEN** the user reloads the application
+- **THEN** the dark theme is applied on load (preference read from localStorage)
+
 ### Requirement: Mock Persistence
 Board creation and listing MUST use the mock data store for this MVP phase.
 
