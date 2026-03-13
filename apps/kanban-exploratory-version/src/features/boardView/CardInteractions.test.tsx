@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { useBoardStore } from '@/features/board/useBoardStore';
@@ -67,10 +67,10 @@ describe('Create card with title validation', () => {
     // Arrange
     const user = userEvent.setup();
     renderBoardView();
-    const todoHeading = screen.getByRole('heading', { name: 'Todo' });
-    const todoColumn = todoHeading.parentElement as HTMLElement;
-    // When not editing, there is exactly one textbox inside the Todo column (the add input)
-    const addInput = todoColumn.querySelectorAll('input')[0] as HTMLInputElement;
+    // "Add" buttons appear per column; the first one is in Todo
+    const todoAddButton = screen.getAllByRole('button', { name: 'Add' })[0];
+    // Navigate to the add-card form div and pick its textbox
+    const addInput = within(todoAddButton.parentElement as HTMLElement).getByRole('textbox') as HTMLInputElement;
 
     // Act
     await user.type(addInput, 'New card');
@@ -145,9 +145,11 @@ describe('Delete card with confirmation', () => {
     // Arrange
     const user = userEvent.setup();
     renderBoardView();
+    // Scope to the card <li> to avoid column-level "Delete" buttons
+    const cardItem = screen.getByText('Test card').closest('li') as HTMLElement;
 
     // Act
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(within(cardItem).getByRole('button', { name: 'Delete' }));
     expect(screen.getByText('Delete this card?')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Yes' }));
 
@@ -159,9 +161,11 @@ describe('Delete card with confirmation', () => {
     // Arrange
     const user = userEvent.setup();
     renderBoardView();
+    // Scope to the card <li> to avoid column-level "Delete" buttons
+    const cardItem = screen.getByText('Test card').closest('li') as HTMLElement;
 
     // Act
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(within(cardItem).getByRole('button', { name: 'Delete' }));
     expect(screen.getByText('Delete this card?')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'No' }));
 

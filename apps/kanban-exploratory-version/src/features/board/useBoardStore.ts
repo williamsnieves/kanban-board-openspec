@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Board, Task } from '@/features/board/types';
+import type { Board, Column, Task } from '@/features/board/types';
+import { PROTECTED_COLUMN_NAMES, validateColumnName } from '@/features/board/columnValidation';
 
 const DEFAULT_COLUMNS = [
   { id: 'todo', name: 'Todo', tasks: [] },
@@ -19,6 +20,9 @@ interface BoardStore {
   editCard: (boardId: string, columnId: string, cardId: string, title: string) => boolean;
   deleteCard: (boardId: string, columnId: string, cardId: string) => void;
   moveCard: (boardId: string, fromColumnId: string, toColumnId: string, cardId: string) => void;
+  createColumn: (boardId: string, name: string) => string | null;
+  renameColumn: (boardId: string, columnId: string, newName: string) => string | null;
+  deleteColumn: (boardId: string, columnId: string) => string | null;
 }
 
 export const useBoardStore = create<BoardStore>()(
@@ -113,6 +117,59 @@ export const useBoardStore = create<BoardStore>()(
                 }
           ),
         }));
+      },
+
+      createColumn: (boardId: string, name: string): string | null => {
+        const board = get().boards.find((b) => b.id === boardId);
+        if (!board) return 'Board not found';
+        const error = validateColumnName(name, board.columns.map((c) => c.name));
+        if (error) return error;
+        const newColumn: Column = { id: crypto.randomUUID(), name: name.trim(), tasks: [] };
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId ? b : { ...b, columns: [...b.columns, newColumn] }
+          ),
+        }));
+        return null;
+      },
+
+      renameColumn: (boardId: string, columnId: string, newName: string): string | null => {
+        const board = get().boards.find((b) => b.id === boardId);
+        if (!board) return 'Board not found';
+        const column = board.columns.find((c) => c.id === columnId);
+        if (!column) return 'Column not found';
+        const error = validateColumnName(newName, board.columns.map((c) => c.name), column.name);
+        if (error) return error;
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((c) =>
+                    c.id !== columnId ? c : { ...c, name: newName.trim() }
+                  ),
+                }
+          ),
+        }));
+        return null;
+      },
+
+      deleteColumn: (boardId: string, columnId: string): string | null => {
+        const board = get().boards.find((b) => b.id === boardId);
+        if (!board) return 'Board not found';
+        const column = board.columns.find((c) => c.id === columnId);
+        if (!column) return 'Column not found';
+        if (PROTECTED_COLUMN_NAMES.some((p) => p.toLowerCase() === column.name.toLowerCase())) {
+          return 'Cannot delete a default column';
+        }
+        if (column.tasks.length > 0) return 'Cannot delete a column with cards';
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId ? b : { ...b, columns: b.columns.filter((c) => c.id !== columnId) }
+          ),
+        }));
+        return null;
       },
 
       moveCard: (boardId: string, fromColumnId: string, toColumnId: string, cardId: string): void => {
