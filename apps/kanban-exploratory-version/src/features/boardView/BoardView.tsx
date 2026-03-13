@@ -362,6 +362,8 @@ export function BoardView() {
                           {task.labels && task.labels.length > 0 && <span data-testid={`card-labels-${task.id}`}>{task.labels.join(', ')}</span>}
                           {task.dueDate && <span data-testid={`card-due-date-${task.id}`}>{task.dueDate}</span>}
                           {task.priority && <span data-testid={`card-priority-${task.id}`}>{task.priority}</span>}
+                          {task.comments?.length > 0 && <span data-testid={`card-comment-count-${task.id}`}>{task.comments.length} comment{task.comments.length !== 1 ? 's' : ''}</span>}
+                          {task.subtasks?.length > 0 && <span data-testid={`card-subtask-progress-${task.id}`}>{task.subtasks.filter(s => s.isCompleted).length}/{task.subtasks.length}</span>}
                         </div>
                         <button onClick={() => handleEditStart(task.id, task.title)}>Edit</button>
                         <button onClick={() => handleDeleteStart(task.id)}>Delete</button>

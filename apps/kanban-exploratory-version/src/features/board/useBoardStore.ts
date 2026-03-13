@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Board, Column, Task } from '@/features/board/types';
+import type { Board, Column, Task, Comment, Subtask } from '@/features/board/types';
 import { PROTECTED_COLUMN_NAMES, validateColumnName } from '@/features/board/columnValidation';
 import { normalizeColumns } from '@/features/board/normalizeColumns';
 
@@ -27,6 +27,11 @@ interface BoardStore {
   reorderColumn: (boardId: string, fromIndex: number, toIndex: number) => string | null;
   reorderTask: (boardId: string, columnId: string, sourceIndex: number, destinationIndex: number) => string | null;
   updateTask: (boardId: string, columnId: string, taskId: string, updates: Partial<Pick<Task, 'description' | 'labels' | 'dueDate' | 'priority' | 'title'>>) => boolean;
+  addComment: (boardId: string, columnId: string, taskId: string, text: string) => Comment | null;
+  deleteComment: (boardId: string, columnId: string, taskId: string, commentId: string) => void;
+  addSubtask: (boardId: string, columnId: string, taskId: string, text: string) => Subtask | null;
+  toggleSubtask: (boardId: string, columnId: string, taskId: string, subtaskId: string) => void;
+  deleteSubtask: (boardId: string, columnId: string, taskId: string, subtaskId: string) => void;
 }
 
 export const useBoardStore = create<BoardStore>()(
@@ -64,7 +69,13 @@ export const useBoardStore = create<BoardStore>()(
 
       createCard: (boardId: string, columnId: string, title: string): Task | null => {
         if (title.trim().length < 1) return null;
-        const newTask: Task = { id: crypto.randomUUID(), title: title.trim() };
+        const newTask: Task = {
+          id: crypto.randomUUID(),
+          title: title.trim(),
+          comments: [],
+          subtasks: [],
+          activityLog: [],
+        };
         set((state) => ({
           boards: state.boards.map((board) =>
             board.id !== boardId
@@ -245,9 +256,23 @@ export const useBoardStore = create<BoardStore>()(
                       ? col
                       : {
                           ...col,
-                          tasks: col.tasks.map((t) =>
-                            t.id !== taskId ? t : { ...t, ...updates }
-                          ),
+                          tasks: col.tasks.map((t) => {
+                            if (t.id !== taskId) return t;
+                            const priorityChanged = updates.priority !== undefined && updates.priority !== t.priority;
+                            const newLog = priorityChanged
+                              ? [
+                                  ...(t.activityLog ?? []),
+                                  {
+                                    id: crypto.randomUUID(),
+                                    action: 'priority' as const,
+                                    details: `Changed priority to ${updates.priority}`,
+                                    timestamp: new Date().toISOString(),
+                                    author: 'System',
+                                  },
+                                ]
+                              : (t.activityLog ?? []);
+                            return { ...t, ...updates, activityLog: newLog };
+                          }),
                         }
                   ),
                 }
@@ -264,6 +289,21 @@ export const useBoardStore = create<BoardStore>()(
           const fromCol = board.columns.find((c) => c.id === fromColumnId);
           const card = fromCol?.tasks.find((t) => t.id === cardId);
           if (!card) return state;
+          const toCol = board.columns.find((c) => c.id === toColumnId);
+          const toColName = toCol?.name ?? toColumnId;
+          const movedCard = {
+            ...card,
+            activityLog: [
+              ...(card.activityLog ?? []),
+              {
+                id: crypto.randomUUID(),
+                action: 'move' as const,
+                details: `Moved to ${toColName}`,
+                timestamp: new Date().toISOString(),
+                author: 'System',
+              },
+            ],
+          };
           return {
             boards: state.boards.map((b) =>
               b.id !== boardId
@@ -275,7 +315,7 @@ export const useBoardStore = create<BoardStore>()(
                         return { ...col, tasks: col.tasks.filter((t) => t.id !== cardId) };
                       }
                       if (col.id === toColumnId) {
-                        return { ...col, tasks: [...col.tasks, card] };
+                        return { ...col, tasks: [...col.tasks, movedCard] };
                       }
                       return col;
                     }),
@@ -283,6 +323,165 @@ export const useBoardStore = create<BoardStore>()(
             ),
           };
         });
+      },
+
+      addComment: (boardId, columnId, taskId, text): Comment | null => {
+        if (!text.trim()) return null;
+        const board = get().boards.find((b) => b.id === boardId);
+        const column = board?.columns.find((c) => c.id === columnId);
+        const task = column?.tasks.find((t) => t.id === taskId);
+        if (!task) return null;
+        const comment: Comment = {
+          id: crypto.randomUUID(),
+          text: text.trim(),
+          createdAt: new Date().toISOString(),
+          author: 'You',
+        };
+        const logEntry = {
+          id: crypto.randomUUID(),
+          action: 'comment' as const,
+          details: `Comment added: "${text.trim()}"`,
+          timestamp: new Date().toISOString(),
+          author: 'You',
+        };
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((col) =>
+                    col.id !== columnId
+                      ? col
+                      : {
+                          ...col,
+                          tasks: col.tasks.map((t) =>
+                            t.id !== taskId
+                              ? t
+                              : {
+                                  ...t,
+                                  comments: [...(t.comments ?? []), comment],
+                                  activityLog: [...(t.activityLog ?? []), logEntry],
+                                }
+                          ),
+                        }
+                  ),
+                }
+          ),
+        }));
+        return comment;
+      },
+
+      deleteComment: (boardId, columnId, taskId, commentId): void => {
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((col) =>
+                    col.id !== columnId
+                      ? col
+                      : {
+                          ...col,
+                          tasks: col.tasks.map((t) =>
+                            t.id !== taskId
+                              ? t
+                              : { ...t, comments: (t.comments ?? []).filter((c) => c.id !== commentId) }
+                          ),
+                        }
+                  ),
+                }
+          ),
+        }));
+      },
+
+      addSubtask: (boardId, columnId, taskId, text): Subtask | null => {
+        if (!text.trim()) return null;
+        const board = get().boards.find((b) => b.id === boardId);
+        const column = board?.columns.find((c) => c.id === columnId);
+        const task = column?.tasks.find((t) => t.id === taskId);
+        if (!task) return null;
+        const subtask: Subtask = {
+          id: crypto.randomUUID(),
+          text: text.trim(),
+          isCompleted: false,
+        };
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((col) =>
+                    col.id !== columnId
+                      ? col
+                      : {
+                          ...col,
+                          tasks: col.tasks.map((t) =>
+                            t.id !== taskId
+                              ? t
+                              : { ...t, subtasks: [...(t.subtasks ?? []), subtask] }
+                          ),
+                        }
+                  ),
+                }
+          ),
+        }));
+        return subtask;
+      },
+
+      toggleSubtask: (boardId, columnId, taskId, subtaskId): void => {
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((col) =>
+                    col.id !== columnId
+                      ? col
+                      : {
+                          ...col,
+                          tasks: col.tasks.map((t) =>
+                            t.id !== taskId
+                              ? t
+                              : {
+                                  ...t,
+                                  subtasks: (t.subtasks ?? []).map((s) =>
+                                    s.id !== subtaskId ? s : { ...s, isCompleted: !s.isCompleted }
+                                  ),
+                                }
+                          ),
+                        }
+                  ),
+                }
+          ),
+        }));
+      },
+
+      deleteSubtask: (boardId, columnId, taskId, subtaskId): void => {
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((col) =>
+                    col.id !== columnId
+                      ? col
+                      : {
+                          ...col,
+                          tasks: col.tasks.map((t) =>
+                            t.id !== taskId
+                              ? t
+                              : { ...t, subtasks: (t.subtasks ?? []).filter((s) => s.id !== subtaskId) }
+                          ),
+                        }
+                  ),
+                }
+          ),
+        }));
       },
     }),
     {
