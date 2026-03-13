@@ -1,3 +1,24 @@
+export interface Comment {
+  id: string;
+  text: string;
+  createdAt: string;
+  author: string;
+}
+
+export interface Subtask {
+  id: string;
+  text: string;
+  isCompleted: boolean;
+}
+
+export interface ActivityLog {
+  id: string;
+  action: 'comment' | 'move' | 'priority' | 'create' | 'update';
+  details: string;
+  timestamp: string;
+  author: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -5,6 +26,9 @@ export interface Task {
   labels?: string[];
   dueDate?: string;
   priority?: 'low' | 'medium' | 'high';
+  comments: Comment[];
+  subtasks: Subtask[];
+  activityLog: ActivityLog[];
 }
 
 export interface Column {
