@@ -41,5 +41,6 @@ export interface Board {
   id: string;
   name: string;
   columns: Column[];
+  // createdAt: stored as Unix timestamp (ms); ISO string fields (dueDate, Comment.createdAt, ActivityLog.timestamp) survive JSON round-trip as-is
   createdAt: number;
 }
