@@ -25,6 +25,7 @@ interface BoardStore {
   renameColumn: (boardId: string, columnId: string, newName: string) => string | null;
   deleteColumn: (boardId: string, columnId: string) => string | null;
   reorderColumn: (boardId: string, fromIndex: number, toIndex: number) => string | null;
+  reorderTask: (boardId: string, columnId: string, sourceIndex: number, destinationIndex: number) => string | null;
 }
 
 export const useBoardStore = create<BoardStore>()(
@@ -193,6 +194,32 @@ export const useBoardStore = create<BoardStore>()(
             b.id !== boardId
               ? b
               : { ...b, columns: newOrder.map((c) => colMap.get(c.id) ?? c) }
+          ),
+        }));
+        return null;
+      },
+
+      reorderTask: (boardId: string, columnId: string, sourceIndex: number, destinationIndex: number): string | null => {
+        const board = get().boards.find((b) => b.id === boardId);
+        if (!board) return 'Board not found';
+        const column = board.columns.find((c) => c.id === columnId);
+        if (!column) return 'Column not found';
+        if (sourceIndex < 0 || sourceIndex >= column.tasks.length) return 'Invalid source index';
+        if (destinationIndex < 0 || destinationIndex >= column.tasks.length) return 'Invalid destination index';
+        if (sourceIndex === destinationIndex) return null;
+        const newTasks = [...column.tasks];
+        const [moved] = newTasks.splice(sourceIndex, 1);
+        newTasks.splice(destinationIndex, 0, moved);
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((c) =>
+                    c.id !== columnId ? c : { ...c, tasks: newTasks }
+                  ),
+                }
           ),
         }));
         return null;
