@@ -32,7 +32,7 @@ describe('Create custom column', () => {
     useBoardStore.getState().createColumn(board.id, 'Review')
 
     // Assert
-    const raw = localStorage.getItem('board-storage')!
+    const raw = localStorage.getItem('flowboard-storage')!
     const parsed = JSON.parse(raw)
     const storedBoard = parsed.state.boards.find((b: { id: string }) => b.id === board.id)
     expect(storedBoard.columns.map((c: { name: string }) => c.name)).toContain('Review')
@@ -115,7 +115,7 @@ describe('Rename custom column', () => {
     useBoardStore.getState().renameColumn(board.id, col.id, 'Ready')
 
     // Assert
-    const raw = localStorage.getItem('board-storage')!
+    const raw = localStorage.getItem('flowboard-storage')!
     const parsed = JSON.parse(raw)
     const storedBoard = parsed.state.boards.find((b: { id: string }) => b.id === board.id)
     const names = storedBoard.columns.map((c: { name: string }) => c.name)
@@ -233,7 +233,7 @@ describe('Delete only empty columns', () => {
     useBoardStore.getState().deleteColumn(board.id, col.id)
 
     // Assert
-    const raw = localStorage.getItem('board-storage')!
+    const raw = localStorage.getItem('flowboard-storage')!
     const parsed = JSON.parse(raw)
     const storedBoard = parsed.state.boards.find((b: { id: string }) => b.id === board.id)
     expect(storedBoard.columns.map((c: { name: string }) => c.name)).not.toContain('Blocked')
@@ -380,7 +380,7 @@ describe('Reorder excluded from this change', () => {
     useBoardStore.getState().deleteColumn(board.id, archiveCol.id)
 
     // Act — read from localStorage to simulate rehydration
-    const raw = localStorage.getItem('board-storage')!
+    const raw = localStorage.getItem('flowboard-storage')!
     const parsed = JSON.parse(raw)
     const storedBoard = parsed.state.boards.find((b: { id: string }) => b.id === board.id)
 

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { localStorageAdapter } from '@/features/persistence/localStorageAdapter';
 import type { Board, Column, Task, Comment, Subtask } from '@/features/board/types';
 import { PROTECTED_COLUMN_NAMES, validateColumnName } from '@/features/board/columnValidation';
 import { normalizeColumns } from '@/features/board/normalizeColumns';
@@ -485,7 +486,16 @@ export const useBoardStore = create<BoardStore>()(
       },
     }),
     {
-      name: 'board-storage',
+      name: 'flowboard-storage',
+      storage: {
+        getItem: (key: string) => localStorageAdapter.load<string>(key),
+        setItem: (key: string, value: string) => localStorageAdapter.save(key, value),
+        removeItem: (key: string) => localStorageAdapter.clear(key),
+      },
+      partialize: (state) => ({
+        boards: state.boards,
+        currentBoardId: state.currentBoardId,
+      }),
     }
   )
 );

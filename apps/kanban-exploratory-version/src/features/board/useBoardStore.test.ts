@@ -75,7 +75,7 @@ describe('Mock Persistence', () => {
     createBoard('Persisted Board');
 
     // Assert
-    const raw = localStorage.getItem('board-storage');
+    const raw = localStorage.getItem('flowboard-storage');
     expect(raw).not.toBeNull();
     const parsed = JSON.parse(raw!);
     expect(parsed.state.boards).toHaveLength(1);
