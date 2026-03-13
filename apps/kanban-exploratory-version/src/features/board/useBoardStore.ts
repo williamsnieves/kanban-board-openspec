@@ -26,6 +26,7 @@ interface BoardStore {
   deleteColumn: (boardId: string, columnId: string) => string | null;
   reorderColumn: (boardId: string, fromIndex: number, toIndex: number) => string | null;
   reorderTask: (boardId: string, columnId: string, sourceIndex: number, destinationIndex: number) => string | null;
+  updateTask: (boardId: string, columnId: string, taskId: string, updates: Partial<Pick<Task, 'description' | 'labels' | 'dueDate' | 'priority' | 'title'>>) => boolean;
 }
 
 export const useBoardStore = create<BoardStore>()(
@@ -223,6 +224,36 @@ export const useBoardStore = create<BoardStore>()(
           ),
         }));
         return null;
+      },
+
+      updateTask: (boardId, columnId, taskId, updates): boolean => {
+        const board = get().boards.find((b) => b.id === boardId);
+        if (!board) return false;
+        const column = board.columns.find((c) => c.id === columnId);
+        if (!column) return false;
+        const task = column.tasks.find((t) => t.id === taskId);
+        if (!task) return false;
+        if (updates.title !== undefined && !updates.title.trim()) return false;
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : {
+                  ...b,
+                  columns: b.columns.map((col) =>
+                    col.id !== columnId
+                      ? col
+                      : {
+                          ...col,
+                          tasks: col.tasks.map((t) =>
+                            t.id !== taskId ? t : { ...t, ...updates }
+                          ),
+                        }
+                  ),
+                }
+          ),
+        }));
+        return true;
       },
 
       moveCard: (boardId: string, fromColumnId: string, toColumnId: string, cardId: string): void => {

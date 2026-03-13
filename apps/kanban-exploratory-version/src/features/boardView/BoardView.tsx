@@ -4,6 +4,7 @@ import { useBoardStore } from '@/features/board/useBoardStore';
 import { useThemeStore } from '@/features/theme/useThemeStore';
 import { normalizeColumns } from '@/features/board/normalizeColumns';
 import { PROTECTED_COLUMN_NAMES } from '@/features/board/columnValidation';
+import { CardDetailModal } from '@/features/boardView/CardDetailModal';
 
 export function BoardView() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,8 @@ export function BoardView() {
   const reorderColumn = useBoardStore((s) => s.reorderColumn);
   const { theme, toggleTheme } = useThemeStore();
 
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+  const [selectedCardColumnId, setSelectedCardColumnId] = useState<string | null>(null);
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
   const [deletingCardId, setDeletingCardId] = useState<string | null>(null);
   const [addTitle, setAddTitle] = useState<Record<string, string>>({});
@@ -349,7 +352,17 @@ export function BoardView() {
                       </div>
                     ) : (
                       <div>
-                        <span>{task.title}</span>
+                        <div
+                          data-testid={`card-open-detail-${task.id}`}
+                          onClick={() => { setSelectedCardId(task.id); setSelectedCardColumnId(column.id); }}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <span>{task.title}</span>
+                          <span data-testid={`card-description-indicator-${task.id}`} style={{ display: task.description ? 'inline' : 'none' }}>📝</span>
+                          {task.labels && task.labels.length > 0 && <span data-testid={`card-labels-${task.id}`}>{task.labels.join(', ')}</span>}
+                          {task.dueDate && <span data-testid={`card-due-date-${task.id}`}>{task.dueDate}</span>}
+                          {task.priority && <span data-testid={`card-priority-${task.id}`}>{task.priority}</span>}
+                        </div>
                         <button onClick={() => handleEditStart(task.id, task.title)}>Edit</button>
                         <button onClick={() => handleDeleteStart(task.id)}>Delete</button>
                         <select
@@ -392,6 +405,12 @@ export function BoardView() {
           Add column
         </button>
       </div>
+      {selectedCardId && (() => {
+        const selCol = displayColumns.find(c => c.id === selectedCardColumnId);
+        const selTask = selCol?.tasks.find(t => t.id === selectedCardId);
+        if (!selTask || !selectedCardColumnId) return null;
+        return <CardDetailModal boardId={board.id} columnId={selectedCardColumnId} task={selTask} onClose={() => setSelectedCardId(null)} onDelete={() => { deleteCard(board.id, selectedCardColumnId, selectedCardId); setSelectedCardId(null); }} />;
+      })()}
     </div>
   );
 }
