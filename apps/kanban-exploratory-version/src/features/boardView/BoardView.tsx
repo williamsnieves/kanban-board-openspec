@@ -12,6 +12,9 @@ export function BoardView() {
   const editCard = useBoardStore((s) => s.editCard);
   const deleteCard = useBoardStore((s) => s.deleteCard);
   const moveCard = useBoardStore((s) => s.moveCard);
+  const createColumn = useBoardStore((s) => s.createColumn);
+  const renameColumn = useBoardStore((s) => s.renameColumn);
+  const deleteColumn = useBoardStore((s) => s.deleteColumn);
   const { theme, toggleTheme } = useThemeStore();
 
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
@@ -20,6 +23,16 @@ export function BoardView() {
   const [editTitle, setEditTitle] = useState('');
   const [addError, setAddError] = useState<Record<string, string>>({});
   const [editError, setEditError] = useState('');
+
+  const [newColumnName, setNewColumnName] = useState('');
+  const [newColumnError, setNewColumnError] = useState('');
+
+  const [renamingColumnId, setRenamingColumnId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [renameError, setRenameError] = useState('');
+
+  const [deletingColumnId, setDeletingColumnId] = useState<string | null>(null);
+  const [deleteColumnError, setDeleteColumnError] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (id) {
@@ -93,6 +106,73 @@ export function BoardView() {
     moveCard(board.id, fromColumnId, toColumnId, cardId);
   };
 
+  const handleCreateColumn = () => {
+    if (!newColumnName.trim()) {
+      setNewColumnError('Column name is required');
+      return;
+    }
+    const error = createColumn(board.id, newColumnName);
+    if (error) {
+      setNewColumnError(error);
+      return;
+    }
+    setNewColumnName('');
+    setNewColumnError('');
+  };
+
+  const handleRenameStart = (columnId: string, currentName: string) => {
+    setRenamingColumnId(columnId);
+    setRenameValue(currentName);
+    setRenameError('');
+    setDeletingColumnId(null);
+  };
+
+  const handleRenameSave = (columnId: string) => {
+    if (!renameValue.trim()) {
+      setRenameError('Column name is required');
+      return;
+    }
+    const error = renameColumn(board.id, columnId, renameValue);
+    if (error) {
+      setRenameError(error);
+      return;
+    }
+    setRenamingColumnId(null);
+    setRenameValue('');
+    setRenameError('');
+  };
+
+  const handleRenameCancel = () => {
+    setRenamingColumnId(null);
+    setRenameValue('');
+    setRenameError('');
+  };
+
+  const handleDeleteColumnStart = (columnId: string) => {
+    setDeletingColumnId(columnId);
+    setRenamingColumnId(null);
+    setDeleteColumnError((prev) => ({ ...prev, [columnId]: '' }));
+  };
+
+  const handleDeleteColumnConfirm = (columnId: string) => {
+    const error = deleteColumn(board.id, columnId);
+    if (error) {
+      setDeleteColumnError((prev) => ({ ...prev, [columnId]: error }));
+      setDeletingColumnId(null);
+      return;
+    }
+    setDeleteColumnError((prev) => {
+      const next = { ...prev };
+      delete next[columnId];
+      return next;
+    });
+    setDeletingColumnId(null);
+  };
+
+  const handleDeleteColumnCancel = () => {
+    setDeletingColumnId(null);
+  };
+
   return (
     <div>
       <h1>{board.name}</h1>
@@ -100,7 +180,69 @@ export function BoardView() {
       <div>
         {displayColumns.map((column) => (
           <div key={column.id}>
-            <h2>{column.name}</h2>
+            {renamingColumnId === column.id ? (
+              <div>
+                <input
+                  data-testid={`column-rename-input-${column.id}`}
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                />
+                {renameError && (
+                  <span data-testid={`column-rename-error-${column.id}`}>{renameError}</span>
+                )}
+                <button
+                  data-testid={`column-rename-save-${column.id}`}
+                  onClick={() => handleRenameSave(column.id)}
+                >
+                  Save
+                </button>
+                <button
+                  data-testid={`column-rename-cancel-${column.id}`}
+                  onClick={handleRenameCancel}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2>{column.name}</h2>
+                <button
+                  data-testid={`column-rename-trigger-${column.id}`}
+                  onClick={() => handleRenameStart(column.id, column.name)}
+                >
+                  Rename
+                </button>
+                {deletingColumnId === column.id ? (
+                  <>
+                    <span>Delete column?</span>
+                    <button
+                      data-testid={`column-delete-confirm-${column.id}`}
+                      onClick={() => handleDeleteColumnConfirm(column.id)}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      data-testid={`column-delete-cancel-${column.id}`}
+                      onClick={handleDeleteColumnCancel}
+                    >
+                      No
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    data-testid={`column-delete-trigger-${column.id}`}
+                    onClick={() => handleDeleteColumnStart(column.id)}
+                  >
+                    Delete column
+                  </button>
+                )}
+                {deleteColumnError[column.id] && (
+                  <span data-testid={`column-delete-error-${column.id}`}>
+                    {deleteColumnError[column.id]}
+                  </span>
+                )}
+              </>
+            )}
             {column.tasks.length === 0 ? (
               <p>No tasks</p>
             ) : (
@@ -157,6 +299,17 @@ export function BoardView() {
             </div>
           </div>
         ))}
+      </div>
+      <div>
+        <input
+          data-testid="add-column-input"
+          value={newColumnName}
+          onChange={(e) => setNewColumnName(e.target.value)}
+        />
+        {newColumnError && <span data-testid="add-column-error">{newColumnError}</span>}
+        <button data-testid="add-column-submit" onClick={handleCreateColumn}>
+          Add column
+        </button>
       </div>
     </div>
   );
