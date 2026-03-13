@@ -237,164 +237,217 @@ export function BoardView() {
   };
 
   return (
-    <div>
-      <h1>{board.name}</h1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl font-bold text-center py-4">{board.name}</h1>
       <button onClick={toggleTheme}>{theme === 'light' ? 'Dark mode' : 'Light mode'}</button>
       <div>
         {reorderError && (
           <span data-testid="column-reorder-error">{reorderError}</span>
         )}
-        {displayColumns.map((column, index) => (
-          <div
-            key={column.id}
-            draggable={!isProtectedColumn(column.name)}
-            onDragStart={(e) => handleDragStart(e, index, column.name)}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, index)}
-          >
-            {renamingColumnId === column.id ? (
-              <div>
+        <div className="flex flex-row gap-4 overflow-x-auto px-4 pb-6 items-start">
+          {displayColumns.map((column, index) => (
+            <div
+              key={column.id}
+              className="w-72 flex-shrink-0 flex flex-col bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700"
+              draggable={!isProtectedColumn(column.name)}
+              onDragStart={(e) => handleDragStart(e, index, column.name)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
+            >
+              {renamingColumnId === column.id ? (
+                <div>
+                  <input
+                    data-testid={`column-rename-input-${column.id}`}
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                  />
+                  {renameError && (
+                    <span data-testid={`column-rename-error-${column.id}`}>{renameError}</span>
+                  )}
+                  <button
+                    data-testid={`column-rename-save-${column.id}`}
+                    onClick={() => handleRenameSave(column.id)}
+                  >
+                    Save
+                  </button>
+                  <button
+                    data-testid={`column-rename-cancel-${column.id}`}
+                    onClick={handleRenameCancel}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-sm font-semibold px-3 pt-3 pb-1 text-gray-700 dark:text-gray-200">{column.name}</h2>
+                  <div className="flex items-center gap-1 px-2 pb-2 flex-wrap">
+                    <button
+                      className="text-xs px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                      data-testid={`column-move-left-${column.id}`}
+                      onClick={() => handleMoveLeft(index, column.name)}
+                    >
+                      ←
+                    </button>
+                    <button
+                      className="text-xs px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                      data-testid={`column-move-right-${column.id}`}
+                      onClick={() => handleMoveRight(index, column.name)}
+                    >
+                      →
+                    </button>
+                    <button
+                      className="text-xs px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                      data-testid={`column-rename-trigger-${column.id}`}
+                      onClick={() => handleRenameStart(column.id, column.name)}
+                    >
+                      Rename
+                    </button>
+                    {deletingColumnId === column.id ? (
+                      <>
+                        <span>Delete column?</span>
+                        <button
+                          className="text-xs px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                          data-testid={`column-delete-confirm-${column.id}`}
+                          onClick={() => handleDeleteColumnConfirm(column.id)}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          className="text-xs px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                          data-testid={`column-delete-cancel-${column.id}`}
+                          onClick={handleDeleteColumnCancel}
+                        >
+                          No
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="text-xs px-1.5 py-0.5 rounded border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300"
+                        data-testid={`column-delete-trigger-${column.id}`}
+                        onClick={() => handleDeleteColumnStart(column.id)}
+                      >
+                        Delete column
+                      </button>
+                    )}
+                    {deleteColumnError[column.id] && (
+                      <span data-testid={`column-delete-error-${column.id}`}>
+                        {deleteColumnError[column.id]}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+              {column.tasks.length === 0 ? (
+                <p className="text-xs text-gray-400 px-3 py-4 text-center">No tasks</p>
+              ) : (
+                <ul className="flex flex-col gap-2 px-2 pb-2 flex-1">
+                  {column.tasks.map((task) => (
+                    <li
+                      key={task.id}
+                      className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-2.5 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      {editingCardId === task.id ? (
+                        <div>
+                          <input
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                          />
+                          {editError && <span>{editError}</span>}
+                          <button onClick={() => handleEditSave(column.id, task.id)}>Save</button>
+                          <button onClick={handleEditCancel}>Cancel</button>
+                        </div>
+                      ) : deletingCardId === task.id ? (
+                        <div>
+                          <span>{task.title}</span>
+                          <span>Delete this card?</span>
+                          <button onClick={() => handleDeleteConfirm(column.id, task.id)}>Yes</button>
+                          <button onClick={handleDeleteCancel}>No</button>
+                        </div>
+                      ) : (
+                        <div>
+                          <div
+                            data-testid={`card-open-detail-${task.id}`}
+                            onClick={() => { setSelectedCardId(task.id); setSelectedCardColumnId(column.id); }}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <span className="text-sm font-medium text-gray-800 dark:text-gray-100 block">{task.title}</span>
+                            <span data-testid={`card-description-indicator-${task.id}`} style={{ display: task.description ? 'inline' : 'none' }}>📝</span>
+                            <div className="flex flex-wrap items-center gap-1 mt-1.5">
+                              {task.labels && task.labels.length > 0 && (
+                                <div data-testid={`card-labels-${task.id}`} className="flex flex-wrap gap-1">
+                                  {task.labels.map(label => (
+                                    <span key={label} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${
+                                      label === 'bug' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                      label === 'feature' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                      label === 'urgent' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+                                      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                    }`}>{label}</span>
+                                  ))}
+                                </div>
+                              )}
+                              {task.dueDate && (
+                                <span data-testid={`card-due-date-${task.id}`} className="text-xs text-gray-500 dark:text-gray-400">
+                                  📅 {task.dueDate}
+                                </span>
+                              )}
+                              {task.priority && (
+                                <span data-testid={`card-priority-${task.id}`} className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+                                  task.priority === 'high' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                                  task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                  'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                                }`}>{task.priority}</span>
+                              )}
+                              {task.comments?.length > 0 && <span data-testid={`card-comment-count-${task.id}`}>{task.comments.length} comment{task.comments.length !== 1 ? 's' : ''}</span>}
+                              {task.subtasks?.length > 0 && <span data-testid={`card-subtask-progress-${task.id}`}>{task.subtasks.filter(s => s.isCompleted).length}/{task.subtasks.length}</span>}
+                            </div>
+                          </div>
+                          <button
+                            className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5"
+                            onClick={() => handleEditStart(task.id, task.title)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5"
+                            onClick={() => handleDeleteStart(task.id)}
+                          >
+                            Delete
+                          </button>
+                          <select
+                            value={column.id}
+                            onChange={(e) => handleMoveCard(column.id, e.target.value, task.id)}
+                          >
+                            {displayColumns.map((col) => (
+                              <option key={col.id} value={col.id}>
+                                {col.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="flex items-center gap-1 px-2 pb-2">
                 <input
-                  data-testid={`column-rename-input-${column.id}`}
-                  value={renameValue}
-                  onChange={(e) => setRenameValue(e.target.value)}
+                  className="flex-1 text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                  value={addTitle[column.id] ?? ''}
+                  onChange={(e) =>
+                    setAddTitle((prev) => ({ ...prev, [column.id]: e.target.value }))
+                  }
                 />
-                {renameError && (
-                  <span data-testid={`column-rename-error-${column.id}`}>{renameError}</span>
-                )}
+                {addError[column.id] && <span>{addError[column.id]}</span>}
                 <button
-                  data-testid={`column-rename-save-${column.id}`}
-                  onClick={() => handleRenameSave(column.id)}
+                  className="text-sm px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600"
+                  onClick={() => handleAddCard(column.id)}
                 >
-                  Save
-                </button>
-                <button
-                  data-testid={`column-rename-cancel-${column.id}`}
-                  onClick={handleRenameCancel}
-                >
-                  Cancel
+                  Add
                 </button>
               </div>
-            ) : (
-              <>
-                <h2>{column.name}</h2>
-                <button
-                  data-testid={`column-move-left-${column.id}`}
-                  onClick={() => handleMoveLeft(index, column.name)}
-                >
-                  ←
-                </button>
-                <button
-                  data-testid={`column-move-right-${column.id}`}
-                  onClick={() => handleMoveRight(index, column.name)}
-                >
-                  →
-                </button>
-                <button
-                  data-testid={`column-rename-trigger-${column.id}`}
-                  onClick={() => handleRenameStart(column.id, column.name)}
-                >
-                  Rename
-                </button>
-                {deletingColumnId === column.id ? (
-                  <>
-                    <span>Delete column?</span>
-                    <button
-                      data-testid={`column-delete-confirm-${column.id}`}
-                      onClick={() => handleDeleteColumnConfirm(column.id)}
-                    >
-                      Yes
-                    </button>
-                    <button
-                      data-testid={`column-delete-cancel-${column.id}`}
-                      onClick={handleDeleteColumnCancel}
-                    >
-                      No
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    data-testid={`column-delete-trigger-${column.id}`}
-                    onClick={() => handleDeleteColumnStart(column.id)}
-                  >
-                    Delete column
-                  </button>
-                )}
-                {deleteColumnError[column.id] && (
-                  <span data-testid={`column-delete-error-${column.id}`}>
-                    {deleteColumnError[column.id]}
-                  </span>
-                )}
-              </>
-            )}
-            {column.tasks.length === 0 ? (
-              <p>No tasks</p>
-            ) : (
-              <ul>
-                {column.tasks.map((task) => (
-                  <li key={task.id}>
-                    {editingCardId === task.id ? (
-                      <div>
-                        <input
-                          value={editTitle}
-                          onChange={(e) => setEditTitle(e.target.value)}
-                        />
-                        {editError && <span>{editError}</span>}
-                        <button onClick={() => handleEditSave(column.id, task.id)}>Save</button>
-                        <button onClick={handleEditCancel}>Cancel</button>
-                      </div>
-                    ) : deletingCardId === task.id ? (
-                      <div>
-                        <span>{task.title}</span>
-                        <span>Delete this card?</span>
-                        <button onClick={() => handleDeleteConfirm(column.id, task.id)}>Yes</button>
-                        <button onClick={handleDeleteCancel}>No</button>
-                      </div>
-                    ) : (
-                      <div>
-                        <div
-                          data-testid={`card-open-detail-${task.id}`}
-                          onClick={() => { setSelectedCardId(task.id); setSelectedCardColumnId(column.id); }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <span>{task.title}</span>
-                          <span data-testid={`card-description-indicator-${task.id}`} style={{ display: task.description ? 'inline' : 'none' }}>📝</span>
-                          {task.labels && task.labels.length > 0 && <span data-testid={`card-labels-${task.id}`}>{task.labels.join(', ')}</span>}
-                          {task.dueDate && <span data-testid={`card-due-date-${task.id}`}>{task.dueDate}</span>}
-                          {task.priority && <span data-testid={`card-priority-${task.id}`}>{task.priority}</span>}
-                          {task.comments?.length > 0 && <span data-testid={`card-comment-count-${task.id}`}>{task.comments.length} comment{task.comments.length !== 1 ? 's' : ''}</span>}
-                          {task.subtasks?.length > 0 && <span data-testid={`card-subtask-progress-${task.id}`}>{task.subtasks.filter(s => s.isCompleted).length}/{task.subtasks.length}</span>}
-                        </div>
-                        <button onClick={() => handleEditStart(task.id, task.title)}>Edit</button>
-                        <button onClick={() => handleDeleteStart(task.id)}>Delete</button>
-                        <select
-                          value={column.id}
-                          onChange={(e) => handleMoveCard(column.id, e.target.value, task.id)}
-                        >
-                          {displayColumns.map((col) => (
-                            <option key={col.id} value={col.id}>
-                              {col.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div>
-              <input
-                value={addTitle[column.id] ?? ''}
-                onChange={(e) =>
-                  setAddTitle((prev) => ({ ...prev, [column.id]: e.target.value }))
-                }
-              />
-              {addError[column.id] && <span>{addError[column.id]}</span>}
-              <button onClick={() => handleAddCard(column.id)}>Add</button>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
       <div>
         <input
