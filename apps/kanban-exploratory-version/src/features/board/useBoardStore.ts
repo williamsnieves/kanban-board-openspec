@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Board, Column, Task } from '@/features/board/types';
 import { PROTECTED_COLUMN_NAMES, validateColumnName } from '@/features/board/columnValidation';
+import { normalizeColumns } from '@/features/board/normalizeColumns';
 
 const DEFAULT_COLUMNS = [
   { id: 'todo', name: 'Todo', tasks: [] },
@@ -23,6 +24,7 @@ interface BoardStore {
   createColumn: (boardId: string, name: string) => string | null;
   renameColumn: (boardId: string, columnId: string, newName: string) => string | null;
   deleteColumn: (boardId: string, columnId: string) => string | null;
+  reorderColumn: (boardId: string, fromIndex: number, toIndex: number) => string | null;
 }
 
 export const useBoardStore = create<BoardStore>()(
@@ -167,6 +169,30 @@ export const useBoardStore = create<BoardStore>()(
         set((state) => ({
           boards: state.boards.map((b) =>
             b.id !== boardId ? b : { ...b, columns: b.columns.filter((c) => c.id !== columnId) }
+          ),
+        }));
+        return null;
+      },
+
+      reorderColumn: (boardId: string, fromIndex: number, toIndex: number): string | null => {
+        const board = get().boards.find((b) => b.id === boardId);
+        if (!board) return 'Board not found';
+        const display = normalizeColumns(board.columns);
+        if (fromIndex < 0 || fromIndex >= display.length) return 'Invalid source index';
+        if (toIndex < 0 || toIndex >= display.length) return 'Invalid target index';
+        const sourceCol = display[fromIndex];
+        if (PROTECTED_COLUMN_NAMES.some((p) => p.toLowerCase() === sourceCol.name.toLowerCase())) {
+          return 'Cannot reorder a default column';
+        }
+        const newOrder = [...display];
+        newOrder.splice(fromIndex, 1);
+        newOrder.splice(toIndex, 0, sourceCol);
+        const colMap = new Map(board.columns.map((c) => [c.id, c]));
+        set((state) => ({
+          boards: state.boards.map((b) =>
+            b.id !== boardId
+              ? b
+              : { ...b, columns: newOrder.map((c) => colMap.get(c.id) ?? c) }
           ),
         }));
         return null;

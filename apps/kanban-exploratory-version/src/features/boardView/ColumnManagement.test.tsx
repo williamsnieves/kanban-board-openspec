@@ -19,6 +19,7 @@ const mockMoveCard = vi.fn();
 const mockCreateColumn = vi.fn();
 const mockRenameColumn = vi.fn();
 const mockDeleteColumn = vi.fn();
+const mockReorderColumn = vi.fn();
 
 /**
  * Board fixture:
@@ -53,6 +54,7 @@ function setupStoreMock() {
         createColumn: mockCreateColumn,
         renameColumn: mockRenameColumn,
         deleteColumn: mockDeleteColumn,
+        reorderColumn: mockReorderColumn,
       })) as unknown as typeof useBoardStore
   );
 }
@@ -89,6 +91,7 @@ beforeEach(() => {
   mockCreateColumn.mockReturnValue(null);
   mockRenameColumn.mockReturnValue(null);
   mockDeleteColumn.mockReturnValue(null);
+  mockReorderColumn.mockReturnValue(null);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

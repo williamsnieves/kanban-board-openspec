@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useBoardStore } from '@/features/board/useBoardStore';
 import { useThemeStore } from '@/features/theme/useThemeStore';
 import { normalizeColumns } from '@/features/board/normalizeColumns';
+import { PROTECTED_COLUMN_NAMES } from '@/features/board/columnValidation';
 
 export function BoardView() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +16,7 @@ export function BoardView() {
   const createColumn = useBoardStore((s) => s.createColumn);
   const renameColumn = useBoardStore((s) => s.renameColumn);
   const deleteColumn = useBoardStore((s) => s.deleteColumn);
+  const reorderColumn = useBoardStore((s) => s.reorderColumn);
   const { theme, toggleTheme } = useThemeStore();
 
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
@@ -33,6 +35,9 @@ export function BoardView() {
 
   const [deletingColumnId, setDeletingColumnId] = useState<string | null>(null);
   const [deleteColumnError, setDeleteColumnError] = useState<Record<string, string>>({});
+
+  const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
+  const [reorderError, setReorderError] = useState('');
 
   useEffect(() => {
     if (id) {
@@ -173,13 +178,77 @@ export function BoardView() {
     setDeletingColumnId(null);
   };
 
+  const isProtectedColumn = (name: string) =>
+    PROTECTED_COLUMN_NAMES.some((p) => p.toLowerCase() === name.toLowerCase());
+
+  const handleDragStart = (e: React.DragEvent, index: number, columnName: string) => {
+    if (isProtectedColumn(columnName)) {
+      e.preventDefault();
+      return;
+    }
+    setDragSourceIndex(index);
+    setReorderError('');
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (dragSourceIndex === null || dragSourceIndex === targetIndex) {
+      setDragSourceIndex(null);
+      return;
+    }
+    const error = reorderColumn(board.id, dragSourceIndex, targetIndex);
+    if (error) {
+      setReorderError(error);
+    }
+    setDragSourceIndex(null);
+  };
+
+  const handleMoveLeft = (columnIndex: number, columnName: string) => {
+    if (isProtectedColumn(columnName)) {
+      setReorderError('Cannot reorder a default column');
+      return;
+    }
+    const targetIndex = columnIndex - 1;
+    if (targetIndex < 0 || isProtectedColumn(displayColumns[targetIndex].name)) {
+      return;
+    }
+    const error = reorderColumn(board.id, columnIndex, targetIndex);
+    if (error) setReorderError(error);
+  };
+
+  const handleMoveRight = (columnIndex: number, columnName: string) => {
+    if (isProtectedColumn(columnName)) {
+      setReorderError('Cannot reorder a default column');
+      return;
+    }
+    const targetIndex = columnIndex + 1;
+    if (targetIndex >= displayColumns.length) {
+      return;
+    }
+    const error = reorderColumn(board.id, columnIndex, targetIndex);
+    if (error) setReorderError(error);
+  };
+
   return (
     <div>
       <h1>{board.name}</h1>
       <button onClick={toggleTheme}>{theme === 'light' ? 'Dark mode' : 'Light mode'}</button>
       <div>
-        {displayColumns.map((column) => (
-          <div key={column.id}>
+        {reorderError && (
+          <span data-testid="column-reorder-error">{reorderError}</span>
+        )}
+        {displayColumns.map((column, index) => (
+          <div
+            key={column.id}
+            draggable={!isProtectedColumn(column.name)}
+            onDragStart={(e) => handleDragStart(e, index, column.name)}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, index)}
+          >
             {renamingColumnId === column.id ? (
               <div>
                 <input
@@ -206,6 +275,18 @@ export function BoardView() {
             ) : (
               <>
                 <h2>{column.name}</h2>
+                <button
+                  data-testid={`column-move-left-${column.id}`}
+                  onClick={() => handleMoveLeft(index, column.name)}
+                >
+                  ←
+                </button>
+                <button
+                  data-testid={`column-move-right-${column.id}`}
+                  onClick={() => handleMoveRight(index, column.name)}
+                >
+                  →
+                </button>
                 <button
                   data-testid={`column-rename-trigger-${column.id}`}
                   onClick={() => handleRenameStart(column.id, column.name)}
