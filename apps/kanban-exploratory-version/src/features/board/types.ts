@@ -1,6 +1,10 @@
 export interface Task {
   id: string;
   title: string;
+  description?: string;
+  labels?: string[];
+  dueDate?: string;
+  priority?: 'low' | 'medium' | 'high';
 }
 
 export interface Column {
